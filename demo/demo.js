@@ -178,7 +178,104 @@ var Dir = function(root, parentWalker, parentWatcher){
 };
 
 
+
+const imageURI = "https://avatars1.githubusercontent.com/u/19539395?s=100&amp;v=4";
+
+// XXX toggable menu item are changing value AFTER being triggered
+var menuDemo = function(e){
+    e.API.menu.addMenu(function(menu){
+        menu.title = "Main menu";
+
+        menu.addAction(menu.NOROLE, function(action){
+            console.warn("Action icon is" + action.icon);
+            action.title = "NOROLE∞";
+            action.icon.URI = imageURI;
+            action.checkable = true;
+            action.checked = true;
+            action.shortcut = "CTRL+P";
+            action.autoRepeat = true;
+            action.updated.connect(function(data){
+                console.warn("UPDATED" + action.checked);
+            });
+            action.triggered.connect(function(data){
+                console.warn("TRIGGERED" + action.checked);
+            });
+        });
+        menu.addAction(menu.TEXT, function(action){
+            console.warn("Action is" + action);
+            action.title = "TEXT∞";
+            action.icon.URI = imageURI;
+            action.checkable = true;
+            action.checked = true;
+            action.shortcut = "CTRL+O";
+            action.autoRepeat = false;
+            console.warn("action.autoRepeat" + action.autoRepeat);
+        });
+        menu.addAction(menu.APPLICATION, function(action){
+            console.warn("Action is" + action);
+            action.title = "APPLICATION∞";
+            action.icon.URI = imageURI;
+            action.checkable = true;
+            action.checked = true;
+        });
+        menu.addAction(menu.ABOUTQT, function(action){
+            console.warn("Action is" + action);
+            action.title = "ABOUTQT∞";
+            action.icon.URI = imageURI;
+            action.checkable = true;
+            action.checked = true;
+        });
+        menu.addAction(menu.ABOUT, function(action){
+            console.warn("Action is" + action);
+            action.title = "ABOUT∞";
+            action.icon.URI = imageURI;
+            action.checkable = true;
+            action.checked = true;
+        });
+        menu.addAction(menu.PREFERENCES, function(action){
+            console.warn("Action is" + action);
+            action.title = "PREFERENCES∞";
+            action.icon.URI = imageURI;
+            action.checkable = true;
+            action.checked = true;
+        });
+        menu.addAction(menu.QUIT, function(action){
+            console.warn("Action is" + action);
+            action.title = "QUIT∞";
+            action.icon.URI = imageURI;
+            action.checkable = true;
+            action.checked = true;
+        });
+
+        menu.addMenu(function(sub){
+            sub.title = "Sub Menu";
+            sub.icon.URI = imageURI;
+            sub.checkable = true;
+            sub.checked = true;
+        });
+    });
+};
+
+var trayDemo = function(e){
+    e.API.tray.menu.addMenu(function(menu){
+        menu.title = "Submenu";
+    });
+    e.API.tray.menu.addAction(e.API.tray.menu.NOROLE, function(action){
+        action.title = "Action";
+    });
+    e.API.tray.icon.URI = imageURI;
+    e.API.tray.tooltip = "Foo foo";
+    e.API.tray.visible = true;
+
+    e.API.tray.activated.connect(function(reason){
+        console.warn("Been activated with reason" + reason);
+    });
+};
+
 window.addEventListener("roxee", function(e){
+    menuDemo(e);
+    trayDemo(e);
+
     // Network demo
     var n = e.API.network;
     console.warn(">" + n.diskCache.maximumSize);
@@ -333,7 +430,9 @@ window.addEventListener("load", function(){
             watcher: channel.objects.Watcher,
             walker: channel.objects.Walker,
             network: channel.objects.Network,
-            server: channel.objects.NetServe
+            server: channel.objects.NetServe,
+            menu: channel.objects.MenuBar,
+            tray: channel.objects.Tray,
         };
         window.dispatchEvent(e);
     });

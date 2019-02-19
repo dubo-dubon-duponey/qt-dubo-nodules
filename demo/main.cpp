@@ -17,6 +17,8 @@
 #include <libdubonodules/filesystem.h>
 #include <libdubonodules/network.h>
 #include <libdubonodules/networkserver.h>
+#include <libdubonodules/menubar.h>
+#include <libdubonodules/tray.h>
 
 #include <QtWebEngine>
 #include <QWebEngineView>
@@ -89,12 +91,17 @@ int mainJavascript(int argc, char *argv[])
     DuboNodules::FileSystem::Walker * walk = new DuboNodules::FileSystem::Walker(chan);
     DuboNodules::Network::Controller * net = new DuboNodules::Network::Controller(QString::fromLatin1("/Users/dmp/tmp/qttestcache"), chan);
     DuboNodules::Network::Server * nets = new DuboNodules::Network::Server(chan);
+    DuboNodules::UI::MenuBar * mb = new DuboNodules::UI::MenuBar(chan);
+    DuboNodules::UI::Tray * tray = new DuboNodules::UI::Tray();
+
     chan->registerObject(QString::fromLatin1("Root"), root);
     chan->registerObject(QString::fromLatin1("Helpers"), help);
     chan->registerObject(QString::fromLatin1("Watcher"), watch);
     chan->registerObject(QString::fromLatin1("Walker"), walk);
     chan->registerObject(QString::fromLatin1("Network"), net);
     chan->registerObject(QString::fromLatin1("NetServe"), nets);
+    chan->registerObject(QString::fromLatin1("MenuBar"), mb);
+    chan->registerObject(QString::fromLatin1("Tray"), tray);
 
     return app.exec();
 }

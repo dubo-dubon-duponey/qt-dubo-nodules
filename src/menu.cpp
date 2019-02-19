@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright (c) 2019, Dubo Dubon Duponey <dubodubonduponey+github@pm.me>
  * All rights reserved.
  *
@@ -9,42 +9,79 @@
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef DUBONODULES_OPENHANDLER_H
-#define DUBONODULES_OPENHANDLER_H
-
-#include <QCoreApplication>
-
-/**
- * This emits signals for supported double clicked files, dropped files (or directories) on the dock icon, or custom supported protocol handlers
- */
+#include "libdubonodules/menu.h"
+#include "libdubonodules/action.h"
 
 namespace DuboNodules{
-namespace Protocols{
+namespace UI{
 
-class Handler : public QObject
+Menu::Menu(QObject *parent) :
+    QObject(parent)
 {
-    Q_OBJECT
-public:
-    // http://burnttoys.blogspot.fr/2008/07/adding-url-scheme-to-qt-application.html
-    // http://stackoverflow.com/questions/6561661/url-scheme-qt-and-mac
-    explicit Handler(QCoreApplication *parent):
-        QObject(parent)
-    {
-        parent->installEventFilter(this);
-    }
+    qt = new QMenu();
+    // Default behavior
+    qt->setSeparatorsCollapsible(true);
+    qt->setTearOffEnabled(false);
 
-    Q_INVOKABLE bool addProtocol(const QString &urlScheme, const QString &appPath);
-    Q_INVOKABLE bool removeProtocol(const QString &urlScheme);
+    icon = new DuboNodules::UI::Icon(this);
 
-    bool eventFilter(QObject * obj, QEvent *event);
+    connect(
+        icon, SIGNAL (updated()),
+        this, SLOT (iconUpdated())
+     );
+}
 
-signals:
-    void urlOpened(const QString & url);
-    void fileOpened(const QString & path);
+Menu::Menu(Menu *parent) :
+    QObject(parent)
+{
+    qt = new QMenu();
+    // Default behavior
+    qt->setSeparatorsCollapsible(true);
+    qt->setTearOffEnabled(false);
 
-};
+    icon = new DuboNodules::UI::Icon(this);
+
+    connect(
+        icon, SIGNAL (updated()),
+        this, SLOT (iconUpdated())
+     );
+
+    if(parent)
+        parent->qt->addMenu(qt);
+}
+
+const QString Menu::title() const
+{
+    return qt->title();
+}
+
+// Can't this be a member?
+void Menu::setTitle(const QString &title) const
+{
+    qt->setTitle(title);
+}
+
+void Menu::clear() const
+{
+    qt->clear();
+}
+
+void Menu::addSeparator() const
+{
+    qt->addSeparator();
+}
+
+QVariant Menu::addAction(int role)
+{
+    Action * action = new Action(this, role);
+    return QVariant::fromValue(static_cast<QObject*>(action));
+}
+
+QVariant Menu::addMenu()
+{
+    Menu * menu = new Menu(this);
+    return QVariant::fromValue(static_cast<QObject*>(menu));
+}
 
 }
 }
-
-#endif // DUBONODULES_OPENHANDLER_H

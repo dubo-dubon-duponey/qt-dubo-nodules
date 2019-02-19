@@ -14,7 +14,7 @@
 
 #include "libdubonodules/handler.h"
 
-namespace RoxeeNodules{
+namespace DuboNodules{
 namespace Protocols{
 
 

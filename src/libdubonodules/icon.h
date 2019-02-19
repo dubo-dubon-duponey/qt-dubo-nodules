@@ -9,42 +9,61 @@
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef DUBONODULES_OPENHANDLER_H
-#define DUBONODULES_OPENHANDLER_H
+#ifndef DUBONODULES_UI_ICON_H
+#define DUBONODULES_UI_ICON_H
 
-#include <QCoreApplication>
+#include <QObject>
+#include <QMenu>
+#include <QNetworkAccessManager>
+#include <QNetworkReply>
+#include <QBuffer>
 
-/**
- * This emits signals for supported double clicked files, dropped files (or directories) on the dock icon, or custom supported protocol handlers
- */
-
+// Helper scriptable object that passes uris around
 namespace DuboNodules{
-namespace Protocols{
+namespace UI{
 
-class Handler : public QObject
+class Icon : public QObject
 {
     Q_OBJECT
 public:
-    // http://burnttoys.blogspot.fr/2008/07/adding-url-scheme-to-qt-application.html
-    // http://stackoverflow.com/questions/6561661/url-scheme-qt-and-mac
-    explicit Handler(QCoreApplication *parent):
-        QObject(parent)
-    {
-        parent->installEventFilter(this);
+    explicit Icon(QObject * parent = nullptr): QObject(parent){
+        connect(
+            &netManager, SIGNAL (finished(QNetworkReply*)),
+            this, SLOT (iconDownloaded(QNetworkReply*))
+         );
     }
 
-    Q_INVOKABLE bool addProtocol(const QString &urlScheme, const QString &appPath);
-    Q_INVOKABLE bool removeProtocol(const QString &urlScheme);
+    Q_PROPERTY(QString  URI    READ getURI WRITE setURI  NOTIFY updated)
 
-    bool eventFilter(QObject * obj, QEvent *event);
+    QPixmap * internalIcon = new QPixmap();
 
 signals:
-    void urlOpened(const QString & url);
-    void fileOpened(const QString & path);
+    void updated();
+
+private slots:
+    void iconDownloaded(QNetworkReply* pReply){
+        QByteArray data = pReply->readAll();
+        pReply->deleteLater();
+        internalIcon->loadFromData(data);
+        emit updated();
+    }
+
+private:
+    QNetworkAccessManager netManager;
+
+    QString getURI() const {
+        QByteArray byteArray;
+        QBuffer buffer(&byteArray);
+        internalIcon->save(&buffer, "PNG");
+        return QString::fromLatin1("data:image/png;base64,") + QString::fromLatin1(byteArray.toBase64());
+    }
+
+    void setURI(const QString url) {
+        netManager.get(QNetworkRequest(url));
+    }
 
 };
-
 }
 }
 
-#endif // DUBONODULES_OPENHANDLER_H
+#endif // DUBONODULES_UI_ICON_H
