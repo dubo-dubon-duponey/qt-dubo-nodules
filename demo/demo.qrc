@@ -1,0 +1,8 @@
+<!DOCTYPE RCC>
+<RCC version="1.0">
+    <qresource prefix="/">
+        <file>demo.html</file>
+        <file>demo.js</file>
+        <file>demo.jpg</file>
+    </qresource>
+</RCC>
