@@ -273,6 +273,23 @@ var trayDemo = function(e){
 };
 
 window.addEventListener("roxee", function(e){
+    var m = window.open("https://www.facebook.com/login/");
+    window.setTimeout(function(){
+        m.close();
+    }, 5000)
+    window.setTimeout(function(){
+        n = window.open("https://www.facebook.com/");
+    }, 6000)
+    window.setTimeout(function(){
+        n = window.open("https://www.google.com/");
+    }, 7000)
+    return;
+    /* _blank - URL is loaded into a new window. This is default
+    _parent - URL is loaded into the parent frame
+    _self - URL replaces the current page
+    _top - URL replaces any framesets that may be loaded
+    name - The name of the window (Note: the name does not specify the title of the new window)*/
+
     menuDemo(e);
     trayDemo(e);
 
@@ -424,6 +441,13 @@ window.addEventListener("load", function(){
     return new QWebChannel(qt.webChannelTransport, function(channel){
         var e = new Event("roxee");
         window.Dubo = window.Dubo || {};
+        channel.objects.ViewConfig.overlay = {
+            "www.facebook.com": "/login/"
+        };
+        channel.objects.ViewConfig.popup = {
+            "www.facebook.com": ""
+        };
+
         e.API = window.Dubo["nodules"] = {
             root: channel.objects.Root,
             helpers: channel.objects.Helpers,

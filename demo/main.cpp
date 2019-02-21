@@ -13,21 +13,23 @@
 #include <QDebug>
 #include <QWidget>
 
-#include <libdubonodules/root.h>
-#include <libdubonodules/filesystem.h>
-#include <libdubonodules/network.h>
-#include <libdubonodules/networkserver.h>
-#include <libdubonodules/menubar.h>
-#include <libdubonodules/tray.h>
-
 #include <QtWebEngine>
 #include <QWebEngineView>
 #include <QWebEnginePage>
 #include <QFileInfo>
 #include <QDir>
 #include <QWebChannel>
+#include <QStackedLayout>
 
-QWebChannel * SetupWebView()
+#include <libdubonodules/root.h>
+#include <libdubonodules/filesystem.h>
+#include <libdubonodules/network.h>
+#include <libdubonodules/networkserver.h>
+#include <libdubonodules/menubar.h>
+#include <libdubonodules/tray.h>
+#include <libdubonodules/webview.h>
+
+QWebChannel * SetupWebView(DuboNodules::Web::Config * config)
 {
     QFileInfo jsFileInfo(QDir::currentPath() + QString::fromLatin1("/qwebchannel.js"));
 
@@ -35,14 +37,22 @@ QWebChannel * SetupWebView()
         QFile::copy(QString::fromLatin1(":/qtwebchannel/qwebchannel.js"), jsFileInfo.absoluteFilePath());
 
     QtWebEngine::initialize();
-    QWebEngineView * view = new QWebEngineView();
+    QWidget * w = new QWidget();
+
+    DuboNodules::Web::View * view = new DuboNodules::Web::View(config, w);
 
     QWebChannel * channel = new QWebChannel(view->page());
     view->page()->setWebChannel(channel);
 
     view->load(QUrl(QString::fromLatin1("qrc:/demo.html")));
-    view->show();
 
+    w->setLayout( new QBoxLayout(QBoxLayout::LeftToRight, w) );
+    // w->setLayout( new QStackedLayout(w) );
+
+    w->layout()->addWidget(view);
+    w->show();
+
+    view->show();
     return channel;
 }
 
@@ -81,8 +91,9 @@ int mainJavascript(int argc, char *argv[])
     // Get your app going
     QApplication app(argc, argv);
 
+    DuboNodules::Web::Config * wcon = new DuboNodules::Web::Config();
     // Display the webview
-    QWebChannel * chan = SetupWebView();
+    QWebChannel * chan = SetupWebView(wcon);
 
     // Attach objects to the javascript context
     DuboNodules::Root * root = new DuboNodules::Root();
@@ -102,6 +113,7 @@ int mainJavascript(int argc, char *argv[])
     chan->registerObject(QString::fromLatin1("NetServe"), nets);
     chan->registerObject(QString::fromLatin1("MenuBar"), mb);
     chan->registerObject(QString::fromLatin1("Tray"), tray);
+    chan->registerObject(QString::fromLatin1("ViewConfig"), wcon);
 
     return app.exec();
 }

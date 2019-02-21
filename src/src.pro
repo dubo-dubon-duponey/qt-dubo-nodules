@@ -1,5 +1,6 @@
 TEMPLATE = lib
 QT = core widgets network
+QT += webenginewidgets webengine
 
 PROJECT_ROOT = $$PWD/..
 include($$PROJECT_ROOT/config/qmakeitup.pri)
@@ -21,6 +22,7 @@ HEADERS +=  $$PWD/lib$${TARGET}/global.h \
             $$PWD/lib$${TARGET}/menu.h \
             $$PWD/lib$${TARGET}/menubar.h \
             $$PWD/lib$${TARGET}/action.h \
+            $$PWD/lib$${TARGET}/webview.h
 
 
 SOURCES +=  $$PWD/root.cpp \
