@@ -12,9 +12,9 @@
 #ifndef DUBONODULES_NETWORK_H
 #define DUBONODULES_NETWORK_H
 
-#include "networkjar.h"
-#include "networkcache.h"
-#include "networkreply.h"
+#include "jar.h"
+#include "cache.h"
+#include "reply.h"
 
 #include <QNetworkAccessManager>
 #include <QBuffer>

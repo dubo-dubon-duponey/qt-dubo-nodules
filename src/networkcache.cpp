@@ -11,7 +11,7 @@
 
 #include <QDir>
 
-#include "libdubonodules/networkcache.h"
+#include "libdubonodules/network/cache.h"
 #include "libdubonodules/filesystem.h"
 
 namespace DuboNodules{

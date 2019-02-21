@@ -23,11 +23,11 @@
 
 #include <libdubonodules/root.h>
 #include <libdubonodules/filesystem.h>
-#include <libdubonodules/network.h>
-#include <libdubonodules/networkserver.h>
+#include <libdubonodules/network/controller.h>
+#include <libdubonodules/network/server.h>
 #include <libdubonodules/menubar.h>
 #include <libdubonodules/tray.h>
-#include <libdubonodules/webview.h>
+#include <libdubonodules/web/kit.h>
 
 QWebChannel * SetupWebView(DuboNodules::Web::Config * config)
 {
