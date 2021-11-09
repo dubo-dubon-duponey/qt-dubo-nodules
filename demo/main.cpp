@@ -36,7 +36,6 @@ QWebChannel * SetupWebView(DuboNodules::Web::Config * config)
     if (!jsFileInfo.exists())
         QFile::copy(QString::fromLatin1(":/qtwebchannel/qwebchannel.js"), jsFileInfo.absoluteFilePath());
 
-    QtWebEngine::initialize();
     QWidget * w = new QWidget();
 
     DuboNodules::Web::View * view = new DuboNodules::Web::View(config, w);
@@ -88,6 +87,8 @@ int mainNoJavascript(int argc, char *argv[])
 
 int mainJavascript(int argc, char *argv[])
 {
+    QtWebEngine::initialize();
+
     // Get your app going
     QApplication app(argc, argv);
 
